@@ -41,12 +41,12 @@ export default {
 		removeWorkHour(hour) {
 			this.API.removeWorkHour(hour.id);
 			this.workHours = this.workHours.filter((h) => h.id !== hour.id);
-			this.$emit("hoursChanged");
+			this.$emit("hoursChanged", this.day);
 		},
 		removeOvertimeHour(hour) {
 			this.API.removeOvertimeHour(hour.id);
 			this.overtime = this.overtime.filter((h) => h.id !== hour.id);
-			this.$emit("hoursChanged");
+			this.$emit("hoursChanged", this.day);
 		},
 		inputWorkHour(keyEvent) {
 			if (keyEvent.keyCode === 13) {
@@ -54,7 +54,7 @@ export default {
 					this.workHours.push(hours);
 				});
 				keyEvent.target.value = "";
-				this.$emit("hoursChanged");
+				this.$emit("hoursChanged", this.day);
 			}
 		},
 		inputWorkHourButton(event) {
@@ -62,7 +62,7 @@ export default {
 				this.workHours.push(hours);
 			});
 			event.target.previousElementSibling.value = "";
-			this.$emit("hoursChanged");
+			this.$emit("hoursChanged", this.day);
 		},
 		inputOvertimeHour(keyEvent) {
 			if (keyEvent.keyCode === 13) {
@@ -70,7 +70,7 @@ export default {
 					this.overtime.push(hours);
 				});
 				keyEvent.target.value = "";
-				this.$emit("hoursChanged");
+				this.$emit("hoursChanged", this.day);
 			}
 		},
 		inputOvertimeButton(event) {
@@ -78,7 +78,7 @@ export default {
 				this.overtime.push(hours);
 			});
 			event.target.previousElementSibling.value = "";
-			this.$emit("hoursChanged");
+			this.$emit("hoursChanged", this.day);
 		}
 	}
 }
