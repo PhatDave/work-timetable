@@ -15,33 +15,49 @@ export default {
 			isCurrentMonth: this.day.isCurrentMonth,
 			isCurrentDay: this.day.isCurrentDay,
 			API: new API(),
+			loading: true,
 		}
 	},
-	beforeMount() {
-		this.API.getWorkDayHours(this.day.date).then((hours) => {
-			this.day.hours = hours;
-		});
-
-		this.API.getOvertimeHours(this.day.date).then((hours) => {
-			this.day.overtime = hours;
-		});
+	async beforeMount() {
+		this.day.workHours = await this.day.workHours;
+		this.day.overtimeHours = await this.day.overtimeHours;
+		this.loading = false;
 	},
 	methods: {
 		showModal() {
 			this.$emit("showModal", this.day);
 		}
 	},
+	computed: {
+		formattedDate() {
+			return `${this.day.date.getDate()}.${this.day.date.getMonth() + 1}.`
+		}
+	}
 }
 </script>
 
 <template>
-	<div :class="{isNotCurrentMonth: !isCurrentMonth, isCurrentDay: isCurrentDay}" @click="showModal">
-		<span :class="{regularHours: this.day.hours >= 8}">{{ this.day.hours }}</span><span v-if="this.day.overtime > 0"
-		                                                                                    class="overtime">+{{ this.day.overtime }}</span>
+	<div :class="{isNotCurrentMonth: !isCurrentMonth, isCurrentDay: isCurrentDay, cell: true}" @click="showModal" v-if="!loading">
+		<div class="date">
+			{{ formattedDate }}
+		</div>
+		<div>
+			<span :class="{regularHours: this.day.workHours >= 8}">{{ this.day.workHours }}</span><span v-if="this.day.overtimeHours > 0"
+			                                                                                            class="overtime">+{{ this.day.overtimeHours }}</span>
+		</div>
 	</div>
 </template>
 
 <style scoped>
+.cell {
+	display: grid;
+	grid-template-rows: 1fr 1fr;
+}
+
+.date {
+	font-size: 1.2rem;
+}
+
 div {
 	margin: auto;
 	display: flex;

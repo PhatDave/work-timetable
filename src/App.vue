@@ -4,6 +4,7 @@ import DayComponent from "@/components/DayComponent.vue";
 import {API} from "@/Utils/API";
 import DayModalComponent from "@/components/DayModalComponent.vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
+import {ref} from "vue";
 
 export default {
 	data() {
@@ -30,17 +31,20 @@ export default {
 	},
 	beforeMount() {
 		let now = new Date();
-		this.days = dateUtils.buildMonth(now.getMonth() + 1, now.getFullYear());
+		let days = dateUtils.buildMonth(now.getMonth() + 1, now.getFullYear());
+		days = days.map(day => {
+			return {
+				...day,
+				workHours: this.API.getWorkDayHours(day.date),
+				overtimeHours: this.API.getOvertimeHours(day.date)
+			};
+		});
+		this.days = days;
 	},
 	methods: {
 		showModal(day) {
 			this.modalDay = day;
 			this.modalShown = true;
-		},
-		updateHours() {
-			let now = new Date();
-			this.days = null;
-			this.days = dateUtils.buildMonth(now.getMonth() + 3, now.getFullYear());
 		}
 	}
 }
@@ -54,7 +58,7 @@ export default {
 		</slot>
 	</div>
 	<Teleport to="body">
-		<DayModalComponent :day="modalDay" :show="modalShown" @close="modalShown = false" @hoursChanged="updateHours"/>
+		<DayModalComponent :day="modalDay" :show="modalShown" @close="modalShown = false"/>
 	</Teleport>
 </template>
 

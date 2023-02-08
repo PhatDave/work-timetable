@@ -41,44 +41,44 @@ export default {
 		removeWorkHour(hour) {
 			this.API.removeWorkHour(hour.id);
 			this.workHours = this.workHours.filter((h) => h.id !== hour.id);
-			this.$emit("hoursChanged", this.day);
+			this.day.workHours = this.day.workHours - hour.hours;
 		},
 		removeOvertimeHour(hour) {
 			this.API.removeOvertimeHour(hour.id);
 			this.overtime = this.overtime.filter((h) => h.id !== hour.id);
-			this.$emit("hoursChanged", this.day);
+			this.day.overtimeHours = this.day.overtimeHours - hour.hours;
 		},
 		inputWorkHour(keyEvent) {
 			if (keyEvent.keyCode === 13) {
 				this.API.addWorkhours(this.day.date, keyEvent.target.value).then(hours => {
 					this.workHours.push(hours);
+					this.day.workHours = this.day.workHours + hours.hours;
 				});
-				keyEvent.target.value = "";
-				this.$emit("hoursChanged", this.day);
+				this.$refs.workHourInput.value = "";
 			}
 		},
 		inputWorkHourButton(event) {
 			this.API.addWorkhours(this.day.date, event.target.previousElementSibling.value).then(hours => {
 				this.workHours.push(hours);
+				this.day.workHours = this.day.workHours + hours.hours;
 			});
-			event.target.previousElementSibling.value = "";
-			this.$emit("hoursChanged", this.day);
+			this.$refs.workHourInput.value = "";
 		},
 		inputOvertimeHour(keyEvent) {
 			if (keyEvent.keyCode === 13) {
 				this.API.addOvertime(this.day.date, keyEvent.target.value).then(hours => {
 					this.overtime.push(hours);
+					this.day.overtimeHours = this.day.overtimeHours + hours.hours;
 				});
-				keyEvent.target.value = "";
-				this.$emit("hoursChanged", this.day);
+				this.$refs.overtimeHourInput.value = "";
 			}
 		},
 		inputOvertimeButton(event) {
 			this.API.addOvertime(this.day.date, event.target.previousElementSibling.value).then(hours => {
 				this.overtime.push(hours);
+				this.day.overtimeHours = this.day.overtimeHours + hours.hours;
 			});
-			event.target.previousElementSibling.value = "";
-			this.$emit("hoursChanged", this.day);
+			this.$refs.overtimeHourInput.value = "";
 		}
 	}
 }
@@ -99,7 +99,7 @@ export default {
 					</slot>
 				</div>
 				<div>
-					<input type="text" placeholder="Add hours" @keyup="inputWorkHour" autofocus>
+					<input type="text" ref="workHourInput" placeholder="Add hours" @keyup="inputWorkHour" autofocus>
 					<button @click="inputWorkHourButton">Add hours</button>
 				</div>
 				Overtime:
@@ -109,7 +109,7 @@ export default {
 					</slot>
 				</div>
 				<div>
-					<input type="text" placeholder="Add overtime hours" @keyup="inputOvertimeHour">
+					<input type="text" ref="overtimeHourInput" placeholder="Add overtime hours" @keyup="inputOvertimeHour">
 					<button @click="inputOvertimeButton">Add overtime hours</button>
 				</div>
 			</div>
@@ -156,6 +156,7 @@ input {
 .hours {
 	margin: 0 2vw;
 	padding: 0 0.5vw;
+	font-size: 2rem;
 }
 
 .hours:hover {
