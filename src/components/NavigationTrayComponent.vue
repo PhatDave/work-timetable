@@ -46,6 +46,7 @@ export default {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	height: 10vh;
 }
 
 .currentTime {
@@ -54,7 +55,7 @@ export default {
 
 button {
 	height: 100%;
-	width: 10vw;
+	width: 25vw;
 	border: 3px solid transparent;
 	cursor: pointer;
 	font-size: 1.5rem;
