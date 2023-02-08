@@ -36,6 +36,11 @@ export default {
 		showModal(day) {
 			this.modalDay = day;
 			this.modalShown = true;
+		},
+		updateHours() {
+			let now = new Date();
+			this.days = null;
+			this.days = dateUtils.buildMonth(now.getMonth() + 3, now.getFullYear());
 		}
 	}
 }
@@ -44,10 +49,12 @@ export default {
 <template>
 	<div class="calendar">
 		<HeaderComponent :title="header" v-for="header in headers"/>
-		<DayComponent :day="day" @showModal="showModal" v-for="day in days" class="day"/>
+		<slot v-for="day in days">
+			<DayComponent :day="day" @showModal="showModal" class="day"/>
+		</slot>
 	</div>
 	<Teleport to="body">
-		<DayModalComponent :day="modalDay" :show="modalShown" @close="modalShown = false"/>
+		<DayModalComponent :day="modalDay" :show="modalShown" @close="modalShown = false" @hoursChanged="updateHours"/>
 	</Teleport>
 </template>
 

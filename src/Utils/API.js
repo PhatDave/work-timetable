@@ -24,4 +24,46 @@ export class API {
 			.then(res => res.json())
 			.then(res => res.reduce((acc, cur) => acc + cur.hours, 0));
 	}
+
+	removeWorkHour(id) {
+		return fetch(`${this.root}workday?id=${id}`, {
+			method: 'DELETE'
+		});
+	}
+
+	removeOvertimeHour(id) {
+		return fetch(`${this.root}overtime?id=${id}`, {
+			method: 'DELETE'
+		});
+	}
+
+	addWorkhours(date, hours) {
+		hours = parseInt(hours);
+		return fetch(`${this.root}workday`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				                     date: date,
+				                     hours: hours
+			                     })
+		}).then(res => res.json());
+	}
+
+	addOvertime(date, hours, description) {
+		hours = parseInt(hours);
+		description = "None";
+		return fetch(`${this.root}overtime`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				                     date: date,
+				                     hours: hours,
+				                     description: description
+			                     })
+		}).then(res => res.json());
+	}
 }

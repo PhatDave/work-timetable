@@ -14,6 +14,7 @@ export default {
 			default: {}
 		}
 	},
+	emits: ["hoursChanged"],
 	data() {
 		return {
 			workHours: [],
@@ -23,42 +24,112 @@ export default {
 	},
 	computed: {},
 	watch: {
-		day: function (newVal, oldVal) {
-			console.log(this.day);
-			this.API.getAllWorkDayHours(this.day.date).then((hours) => {
+		day: function(newVal, oldVal) {
+			this.API.getAllWorkDayHours(newVal.date).then((hours) => {
 				this.workHours = hours;
-				console.log(hours);
 			});
-			this.API.getAllOvertimeHours(this.day.date).then((hours) => {
+			this.API.getAllOvertimeHours(newVal.date).then((hours) => {
 				this.overtime = hours;
-				console.log(hours);
 			});
 		}
 	},
+	methods: {
+		block(event) {
+			event.stopPropagation();
+			event.preventDefault();
+		},
+		removeWorkHour(hour) {
+			this.API.removeWorkHour(hour.id);
+			this.workHours = this.workHours.filter((h) => h.id !== hour.id);
+			this.$emit("hoursChanged");
+		},
+		removeOvertimeHour(hour) {
+			this.API.removeOvertimeHour(hour.id);
+			this.overtime = this.overtime.filter((h) => h.id !== hour.id);
+			this.$emit("hoursChanged");
+		},
+		inputWorkHour(keyEvent) {
+			if (keyEvent.keyCode === 13) {
+				this.API.addWorkhours(this.day.date, keyEvent.target.value).then(hours => {
+					this.workHours.push(hours);
+				});
+				keyEvent.target.value = "";
+				this.$emit("hoursChanged");
+			}
+		},
+		inputWorkHourButton(event) {
+			this.API.addWorkhours(this.day.date, event.target.previousElementSibling.value).then(hours => {
+				this.workHours.push(hours);
+			});
+			event.target.previousElementSibling.value = "";
+			this.$emit("hoursChanged");
+		},
+		inputOvertimeHour(keyEvent) {
+			if (keyEvent.keyCode === 13) {
+				this.API.addOvertime(this.day.date, keyEvent.target.value).then(hours => {
+					this.overtime.push(hours);
+				});
+				keyEvent.target.value = "";
+				this.$emit("hoursChanged");
+			}
+		},
+		inputOvertimeButton(event) {
+			this.API.addOvertime(this.day.date, event.target.previousElementSibling.value).then(hours => {
+				this.overtime.push(hours);
+			});
+			event.target.previousElementSibling.value = "";
+			this.$emit("hoursChanged");
+		}
+	}
 }
 </script>
 
 <template>
 	<div v-if="show" class="modal-mask" @click="$emit('close')">
-		<div class="modal-container">
+		<div class="modal-container" @click="block">
 			<div class="modal-header">
 				<slot name="header">{{ this.day.date }}</slot>
 			</div>
 
 			<div class="modal-body">
-				<slot name="body">default body</slot>
-			</div>
-
-			<div class="modal-footer">
-				<slot name="footer">
-					default footer
-				</slot>
+				Regular hours:
+				<div class="hours" v-for="hour in workHours" @click="removeWorkHour(hour)">
+					<slot>
+						{{ hour.hours }}
+					</slot>
+				</div>
+				<div>
+					<input type="text" placeholder="Add hours" @keyup="inputWorkHour" autofocus>
+					<button @click="inputWorkHourButton">Add hours</button>
+				</div>
+				Overtime:
+				<div class="hours" v-for="hour in overtime" @click="removeOvertimeHour(hour)">
+					<slot>
+						{{ hour.hours }} ({{ hour.description }})
+					</slot>
+				</div>
+				<div>
+					<input type="text" placeholder="Add overtime hours" @keyup="inputOvertimeHour">
+					<button @click="inputOvertimeButton">Add overtime hours</button>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <style scoped>
+button {
+	width: 100%;
+	border: 1px solid deepskyblue;
+}
+
+input {
+	margin: auto;
+	width: 100%;
+	border: 0;
+	padding: 0;
+}
+
 .modal-mask {
 	position: fixed;
 	z-index: 9998;
@@ -71,7 +142,7 @@ export default {
 }
 
 .modal-container {
-	width: 60vw;
+	width: 20vw;
 	margin: auto;
 	padding: 20px 30px;
 	border-radius: 2px;
@@ -80,5 +151,14 @@ export default {
 
 .modal-body {
 	margin: 20px 0;
+}
+
+.hours {
+	margin: 0 2vw;
+	padding: 0 0.5vw;
+}
+
+.hours:hover {
+	background-color: darkred;
 }
 </style>

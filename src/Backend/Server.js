@@ -72,7 +72,8 @@ class DayRepository {
 	}
 
 	save(day, month, year) {
-		return PREPARED_STATEMENTS.day_insert.run(String(day), String(month), String(year)).lastInsertRowid;
+		let insertRowid = PREPARED_STATEMENTS.day_insert.run(String(day), String(month), String(year)).lastInsertRowid;
+		return this.findById(insertRowid);
 	}
 
 	saveIfNoExists(day, month, year) {
@@ -80,7 +81,7 @@ class DayRepository {
 		if (existing) {
 			return existing.id;
 		}
-		return this.save(day, month, year);
+		return this.save(day, month, year).id;
 	}
 
 	update(id, day, month, year) {
@@ -110,7 +111,8 @@ class WorkDayRepository {
 	}
 
 	save(dayId, hours) {
-		return PREPARED_STATEMENTS.work_day_insert.run(dayId, hours).lastInsertRowid;
+		let insertRowid = PREPARED_STATEMENTS.work_day_insert.run(dayId, hours).lastInsertRowid;
+		return this.findById(insertRowid);
 	}
 
 	update(id, hours) {
@@ -140,7 +142,8 @@ class OvertimeRepository {
 	}
 
 	save(dayId, hours, description) {
-		return PREPARED_STATEMENTS.overtime_insert.run(dayId, hours, description).lastInsertRowid;
+		let insertRowid = PREPARED_STATEMENTS.overtime_insert.run(dayId, hours, description).lastInsertRowid;
+		return this.findById(insertRowid);
 	}
 
 	update(id, hours, description) {
@@ -163,7 +166,7 @@ class API {
 		let year = date.getFullYear();
 
 		let dayId = dayRepository.saveIfNoExists(day, month, year);
-		workDayRepository.save(dayId, hours);
+		return workDayRepository.save(dayId, hours);
 	}
 
 	addOvertime(date, hours, description) {
@@ -172,7 +175,7 @@ class API {
 		let year = date.getFullYear();
 
 		let dayId = dayRepository.saveIfNoExists(day, month, year);
-		overtimeRepository.save(dayId, hours, description);
+		return overtimeRepository.save(dayId, hours, description);
 	}
 }
 
@@ -251,7 +254,18 @@ class WorkDayController {
 			let date = new Date(req.body.date);
 			dateValidator.validate(date, res);
 
-			api.createNewWorkDay(date, hours);
+			let workDay = api.createNewWorkDay(date, hours);
+			res.status(200).send(workDay);
+		});
+
+		app.delete(`${this.route}`, (req, res) => {
+			let id = req.query.id;
+			if (!!!id) {
+				res.status(400).send('Invalid or missing id');
+				return;
+			}
+
+			workDayRepository.deleteById(id);
 			res.status(200).send('OK');
 		});
 	}
@@ -296,7 +310,18 @@ class OvertimeController {
 				return;
 			}
 
-			api.addOvertime(date, hours, description);
+			let overtime = api.addOvertime(date, hours, description);
+			res.status(200).send(overtime);
+		});
+
+		app.delete(`${this.route}`, (req, res) => {
+			let id = req.query.id;
+			if (!!!id) {
+				res.status(400).send('Invalid or missing id');
+				return;
+			}
+
+			overtimeRepository.deleteById(id);
 			res.status(200).send('OK');
 		});
 	}
