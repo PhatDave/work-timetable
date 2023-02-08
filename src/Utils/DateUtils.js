@@ -20,6 +20,13 @@ export const DayEnum = {
 	6: new DayEnumItem(6, "Saturday"),
 }
 
+export class Day {
+	constructor(date) {
+		this.date = date;
+		this.isCurrentMonth = new Date().getMonth() === date.getMonth();
+	}
+}
+
 export function getDaysInMonth(month, year) {
 	// Although months are 0 indexed we are not doing -1 here because we're interested in the next month's 0th day
 	// Which is effectively the current month's last day which is effectively the count of days of the current month
@@ -84,5 +91,5 @@ export function buildMonth(month, year) {
 	days.push(...getFirstNDays(month, year, getDaysInMonth(month, year)));
 	days.push(...nextMonthDays);
 
-	return days;
+	return days.map(day => new Day(day));
 }

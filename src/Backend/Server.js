@@ -187,6 +187,19 @@ app.use(cors())
 
 const ROOT_ROUTE = '/api';
 
+class DateValidator {
+	constructor() {
+	}
+
+	validate(date, res) {
+		if (date.toString() === 'Invalid Date') {
+			res.status(400).send('Invalid date');
+		}
+	}
+}
+
+const dateValidator = new DateValidator();
+
 class DayController {
 	constructor() {
 		this.route = `${ROOT_ROUTE}/day`;
@@ -196,10 +209,7 @@ class DayController {
 				res.json(dayRepository.findById(req.query.id));
 			} else if (req.query.date) {
 				const date = new Date(req.query.date);
-				if (date.toString() === 'Invalid Date') {
-					res.status(400).send('Invalid date');
-					return;
-				}
+				dateValidator.validate(date, res);
 				res.json(dayRepository.findByDate(date.getDate(), date.getMonth() + 1, date.getFullYear()));
 			} else {
 				res.json(dayRepository.findAll());
@@ -210,13 +220,23 @@ class DayController {
 
 class WorkDayController {
 	constructor() {
-		this.route = `${ROOT_ROUTE}/work-day`;
+		this.route = `${ROOT_ROUTE}/workday`;
 
 		app.get(`${this.route}`, (req, res) => {
 			if (req.query.day) {
 				res.json(workDayRepository.findByDayId(req.query.day));
 			} else if (req.query.id) {
 				res.json(workDayRepository.findById(req.query.id));
+			} else if (req.query.date) {
+				const date = new Date(req.query.date);
+				dateValidator.validate(date, res);
+
+				const day = dayRepository.findByDate(date.getDate(), date.getMonth() + 1, date.getFullYear());
+				if (!!!day) {
+					res.json([]);
+					return;
+				}
+				res.json(workDayRepository.findByDayId(day.id));
 			} else {
 				res.json(workDayRepository.findAll());
 			}
@@ -229,10 +249,7 @@ class WorkDayController {
 			}
 
 			let date = new Date(req.body.date);
-			if (date.toString() === 'Invalid Date') {
-				res.status(400).send('Invalid date');
-				return;
-			}
+			dateValidator.validate(date, res);
 
 			api.createNewWorkDay(date, hours);
 			res.status(200).send('OK');
@@ -249,6 +266,15 @@ class OvertimeController {
 				res.json(overtimeRepository.findByDayId(req.query.day));
 			} else if (req.query.id) {
 				res.json(overtimeRepository.findById(req.query.id));
+			} else if (req.query.date) {
+				const date = new Date(req.query.date);
+				dateValidator.validate(date, res);
+				const day = dayRepository.findByDate(date.getDate(), date.getMonth() + 1, date.getFullYear());
+				if (!!!day) {
+					res.json([]);
+					return;
+				}
+				res.json(overtimeRepository.findByDayId(day.id));
 			} else {
 				res.json(overtimeRepository.findAll());
 			}
@@ -262,10 +288,7 @@ class OvertimeController {
 			}
 
 			let date = new Date(req.body.date);
-			if (date.toString() === 'Invalid Date') {
-				res.status(400).send('Invalid or missing date');
-				return;
-			}
+			dateValidator.validate(date, res);
 
 			let description = req.body.description;
 			if (!!!description) {
