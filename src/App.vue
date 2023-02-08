@@ -6,6 +6,7 @@ import DayModalComponent from "@/components/DayModalComponent.vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import {ref} from "vue";
 import NavigationTrayComponent from "@/components/NavigationTrayComponent.vue";
+import TotalsComponent from "@/components/TotalsComponent.vue";
 
 export default {
 	data() {
@@ -33,7 +34,8 @@ export default {
 		HeaderComponent,
 		DayComponent,
 		DayModalComponent,
-		NavigationTrayComponent
+		NavigationTrayComponent,
+		TotalsComponent
 	},
 	beforeMount() {
 		this.updateDays();
@@ -79,6 +81,7 @@ export default {
 			<DayComponent :day="day" @showModal="showModal" class="day"/>
 		</slot>
 	</div>
+	<TotalsComponent :days="days"/>
 	<Teleport to="body">
 		<DayModalComponent :day="modalDay" :show="modalShown" @close="modalShown = false"/>
 	</Teleport>
@@ -94,7 +97,7 @@ export default {
 	background-color: rgba(0, 143, 154, 0.3);
 	border: 2px solid rgba(0, 143, 154, 0.3);
 	gap: 2px;
-	margin: 0 30vw;
+	margin: 2vh 30vw;
 }
 
 .calendar > div {
@@ -107,4 +110,12 @@ export default {
 </style>
 
 <style>
+/* These important-s are necessary because darkMode overwrites these colors for some reason */
+.overtime {
+	color: #ff906e !important;
+}
+
+.regularHours {
+	color: #a0e8ff !important;
+}
 </style>

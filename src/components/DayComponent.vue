@@ -76,12 +76,4 @@ div > span {
 .isCurrentDay {
 	border: 1px solid #ff906e;
 }
-
-.overtime {
-	color: #ff906e;
-}
-
-.regularHours {
-	color: #a0e8ff;
-}
 </style>
