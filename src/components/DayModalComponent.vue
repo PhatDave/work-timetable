@@ -20,6 +20,9 @@ export default {
 			workHours: [],
 			overtime: [],
 			API: new API(),
+			hoursInput: "",
+			overtimeInput: "",
+			overtimeDescriptionInput: ""
 		}
 	},
 	computed: {},
@@ -50,35 +53,37 @@ export default {
 		},
 		inputWorkHour(keyEvent) {
 			if (keyEvent.keyCode === 13) {
-				this.API.addWorkhours(this.day.date, keyEvent.target.value).then(hours => {
+				this.API.addWorkhours(this.day.date, this.hoursInput).then(hours => {
 					this.workHours.push(hours);
 					this.day.workHours = this.day.workHours + hours.hours;
 				});
-				this.$refs.workHourInput.value = "";
+				this.hoursInput = "";
 			}
 		},
 		inputWorkHourButton(event) {
-			this.API.addWorkhours(this.day.date, event.target.previousElementSibling.value).then(hours => {
+			this.API.addWorkhours(this.day.date, this.hoursInput).then(hours => {
 				this.workHours.push(hours);
 				this.day.workHours = this.day.workHours + hours.hours;
 			});
-			this.$refs.workHourInput.value = "";
+			this.hoursInput = "";
 		},
 		inputOvertimeHour(keyEvent) {
 			if (keyEvent.keyCode === 13) {
-				this.API.addOvertime(this.day.date, keyEvent.target.value).then(hours => {
+				this.API.addOvertime(this.day.date, this.overtimeInput, this.overtimeDescriptionInput).then(hours => {
 					this.overtime.push(hours);
 					this.day.overtimeHours = this.day.overtimeHours + hours.hours;
 				});
-				this.$refs.overtimeHourInput.value = "";
+				this.overtimeInput = "";
+				this.overtimeDescriptionInput = "";
 			}
 		},
 		inputOvertimeButton(event) {
-			this.API.addOvertime(this.day.date, event.target.previousElementSibling.value).then(hours => {
+			this.API.addOvertime(this.day.date, this.overtimeInput, this.overtimeDescriptionInput).then(hours => {
 				this.overtime.push(hours);
 				this.day.overtimeHours = this.day.overtimeHours + hours.hours;
 			});
-			this.$refs.overtimeHourInput.value = "";
+			this.overtimeInput = "";
+			this.overtimeDescriptionInput = "";
 		}
 	}
 }
@@ -92,24 +97,25 @@ export default {
 			</div>
 
 			<div class="modal-body">
-				Regular hours:
-				<div class="hours" v-for="hour in workHours" @click="removeWorkHour(hour)">
-					<slot>
-						{{ hour.hours }}
-					</slot>
+				<div>
+					Regular hours:
+				</div>
+				<div v-for="hour in workHours" @click="removeWorkHour(hour)" class="hoursContainer">
+					<span class="hours">{{ hour.hours }}</span>
 				</div>
 				<div>
-					<input type="text" ref="workHourInput" placeholder="Add hours" @keyup="inputWorkHour" autofocus>
+					<input type="text" placeholder="Add hours" @keyup="inputWorkHour" v-model="hoursInput" autofocus>
 					<button @click="inputWorkHourButton">Add hours</button>
 				</div>
-				Overtime:
-				<div class="hours" v-for="hour in overtime" @click="removeOvertimeHour(hour)">
-					<slot>
-						{{ hour.hours }} ({{ hour.description }})
-					</slot>
+				<div>
+					Overtime:
+				</div>
+				<div v-for="hour in overtime" @click="removeOvertimeHour(hour)" class="hoursContainer">
+					<span class="hours">{{ hour.hours }}</span> <span class="overtimeDescription">({{ hour.description }})</span>
 				</div>
 				<div>
-					<input type="text" ref="overtimeHourInput" placeholder="Add overtime hours" @keyup="inputOvertimeHour">
+					<input type="text" placeholder="Add overtime hours" @keyup="inputOvertimeHour" v-model="overtimeInput">
+					<input type="text" placeholder="Overtime description" @keyup="inputOvertimeHour" v-model="overtimeDescriptionInput">
 					<button @click="inputOvertimeButton">Add overtime hours</button>
 				</div>
 			</div>
@@ -159,7 +165,15 @@ input {
 	font-size: 2rem;
 }
 
-.hours:hover {
+.overtimeDescription {
+	font-size: 1rem;
+}
+
+.hoursContainer:hover {
+	background-color: darkred;
+}
+
+.hoursContainer:hover * {
 	background-color: darkred;
 }
 </style>

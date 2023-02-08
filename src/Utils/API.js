@@ -53,7 +53,6 @@ export class API {
 
 	addOvertime(date, hours, description) {
 		hours = parseInt(hours);
-		description = "None";
 		return fetch(`${this.root}overtime`, {
 			method: 'POST',
 			headers: {
