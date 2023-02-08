@@ -5,6 +5,7 @@ import {API} from "@/Utils/API";
 import DayModalComponent from "@/components/DayModalComponent.vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import {ref} from "vue";
+import NavigationTrayComponent from "@/components/NavigationTrayComponent.vue";
 
 export default {
 	data() {
@@ -21,36 +22,57 @@ export default {
 				"Thu",
 				"Fri",
 				"Sat"
-			]
+			],
+			currentTime: {
+				month: new Date().getMonth() + 1,
+				year: new Date().getFullYear()
+			}
 		}
 	},
 	components: {
 		HeaderComponent,
 		DayComponent,
 		DayModalComponent,
+		NavigationTrayComponent
 	},
 	beforeMount() {
-		let now = new Date();
-		let days = dateUtils.buildMonth(now.getMonth() + 1, now.getFullYear());
-		days = days.map(day => {
-			return {
-				...day,
-				workHours: this.API.getWorkDayHours(day.date),
-				overtimeHours: this.API.getOvertimeHours(day.date)
-			};
-		});
-		this.days = days;
+		this.updateDays();
 	},
 	methods: {
 		showModal(day) {
 			this.modalDay = day;
 			this.modalShown = true;
+		},
+		async updateDays() {
+			let days = dateUtils.buildMonth(this.currentTime.month, this.currentTime.year);
+			days = days.map(day => {
+				let obj = {
+					...day,
+					workHours: this.API.getWorkDayHours(day.date),
+					overtimeHours: this.API.getOvertimeHours(day.date)
+				};
+				return obj;
+			});
+			for (let day of days) {
+				day.workHours = await day.workHours;
+				day.overtimeHours = await day.overtimeHours;
+			}
+			this.days = days;
 		}
+	},
+	watch: {
+		currentTime: {
+			handler(newValue) {
+				this.updateDays();
+			},
+			deep: true
+		},
 	}
 }
 </script>
 
 <template>
+	<NavigationTrayComponent :current-time="currentTime"/>
 	<div class="calendar">
 		<HeaderComponent :title="header" v-for="header in headers"/>
 		<slot v-for="day in days">

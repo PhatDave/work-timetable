@@ -15,17 +15,16 @@ export default {
 			isCurrentMonth: this.day.isCurrentMonth,
 			isCurrentDay: this.day.isCurrentDay,
 			API: new API(),
-			loading: true,
 		}
-	},
-	async beforeMount() {
-		this.day.workHours = await this.day.workHours;
-		this.day.overtimeHours = await this.day.overtimeHours;
-		this.loading = false;
 	},
 	methods: {
 		showModal() {
 			this.$emit("showModal", this.day);
+		},
+		addWorkHours(event) {
+			this.API.addWorkhours(this.day.date, 8).then(hours => {
+				this.day.workHours = this.day.workHours + hours.hours;
+			});
 		}
 	},
 	computed: {
@@ -37,7 +36,7 @@ export default {
 </script>
 
 <template>
-	<div :class="{isNotCurrentMonth: !isCurrentMonth, isCurrentDay: isCurrentDay, cell: true}" @click="showModal" v-if="!loading">
+	<div :class="{isNotCurrentMonth: !isCurrentMonth, isCurrentDay: isCurrentDay, cell: true}" @click="showModal" @auxclick="addWorkHours" v-if="!loading">
 		<div class="date">
 			{{ formattedDate }}
 		</div>
