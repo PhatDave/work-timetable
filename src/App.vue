@@ -1,19 +1,32 @@
 <script>
 import * as dateUtils from "@/Utils/dateUtils";
 import DayComponent from "@/components/DayComponent.vue";
-import {API} from "@/Utils/DBApi/API";
+import {API} from "@/Utils/API";
+import DayModalComponent from "@/components/DayModalComponent.vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 
 export default {
 	data() {
 		return {
 			days: {},
 			API: new API(),
-			showModal: false,
-			modalDay: {},
+			modalShown: false,
+			modalDay: Object,
+			headers: [
+				"Sun",
+				"Mon",
+				"Tue",
+				"Wed",
+				"Thu",
+				"Fri",
+				"Sat"
+			]
 		}
 	},
 	components: {
+		HeaderComponent,
 		DayComponent,
+		DayModalComponent,
 	},
 	beforeMount() {
 		let now = new Date();
@@ -21,9 +34,8 @@ export default {
 	},
 	methods: {
 		showModal(day) {
-			console.log("AAAAAAAAAAAAAAA");
-			this.day = day;
-			this.showModal = true;
+			this.modalDay = day;
+			this.modalShown = true;
 		}
 	}
 }
@@ -31,12 +43,11 @@ export default {
 
 <template>
 	<div class="calendar">
-		<div v-for="day in days">
-			<DayComponent :day="day" @showModal="showModal"/>
-		</div>
+		<HeaderComponent :title="header" v-for="header in headers"/>
+		<DayComponent :day="day" @showModal="showModal" v-for="day in days" class="day"/>
 	</div>
 	<Teleport to="body">
-		<DayModalComponent :day="modalDay" :show="showModal" @close="showModal = false"/>
+		<DayModalComponent :day="modalDay" :show="modalShown" @close="modalShown = false"/>
 	</Teleport>
 </template>
 
@@ -44,7 +55,7 @@ export default {
 .calendar {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
-	grid-template-rows: repeat(6, 1fr);
+	grid-template-rows: 1fr repeat(6, 2fr);
 	justify-items: center;
 	text-align: center;
 	background-color: rgba(0, 143, 154, 0.3);
@@ -54,8 +65,10 @@ export default {
 }
 
 .calendar > div {
-	min-width: 100%;
-	min-height: 10vh;
+	width: 100%;
+}
+
+.day {
 	aspect-ratio: 1;
 }
 </style>

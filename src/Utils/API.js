@@ -3,6 +3,16 @@ export class API {
 		this.root = `http://localhost:9001/api/`
 	}
 
+	getAllWorkDayHours(date) {
+		return fetch(`${this.root}workday?date=${date}`)
+			.then(res => res.json());
+	}
+
+	getAllOvertimeHours(date) {
+		return fetch(`${this.root}overtime?date=${date}`)
+			.then(res => res.json());
+	}
+
 	getWorkDayHours(date) {
 		return fetch(`${this.root}workday?date=${date}`)
 			.then(res => res.json())
