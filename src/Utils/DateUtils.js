@@ -23,9 +23,6 @@ export const DayEnum = {
 export class Day {
 	constructor(date) {
 		this.date = date;
-		let now = new Date();
-		this.isCurrentMonth = now.getMonth() === date.getMonth();
-		this.isCurrentDay = now.getDate() === date.getDate() && now.getMonth() === date.getMonth();
 	}
 }
 

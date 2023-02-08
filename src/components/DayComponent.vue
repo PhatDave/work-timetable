@@ -21,7 +21,7 @@ export default {
 		showModal() {
 			this.$emit("showModal", this.day);
 		},
-		addWorkHours(event) {
+		addWorkHours() {
 			this.API.addWorkhours(this.day.date, 8).then(hours => {
 				this.day.workHours = this.day.workHours + hours.hours;
 			});
@@ -30,6 +30,15 @@ export default {
 	computed: {
 		formattedDate() {
 			return `${this.day.date.getDate()}.${this.day.date.getMonth() + 1}.`
+		}
+	},
+	watch: {
+		day: {
+			handler: function (newVal, oldVal) {
+				this.isCurrentMonth = newVal.isCurrentMonth;
+				this.isCurrentDay = newVal.isCurrentDay;
+			},
+			deep: true
 		}
 	}
 }

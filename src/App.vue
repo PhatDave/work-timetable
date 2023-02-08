@@ -25,7 +25,7 @@ export default {
 				"Sat"
 			],
 			currentTime: {
-				month: new Date().getMonth() + 1,
+				month: new Date().getMonth(),
 				year: new Date().getFullYear()
 			}
 		}
@@ -46,12 +46,15 @@ export default {
 			this.modalShown = true;
 		},
 		async updateDays() {
-			let days = dateUtils.buildMonth(this.currentTime.month, this.currentTime.year);
+			let now = new Date();
+			let days = dateUtils.buildMonth(this.currentTime.month + 1, this.currentTime.year);
 			days = days.map(day => {
 				let obj = {
 					...day,
 					workHours: this.API.getWorkDayHours(day.date),
-					overtimeHours: this.API.getOvertimeHours(day.date)
+					overtimeHours: this.API.getOvertimeHours(day.date),
+					isCurrentMonth: this.currentTime.month === day.date.getMonth(),
+					isCurrentDay: this.currentTime.month === day.date.getMonth() && now.getDate() === day.date.getDate()
 				};
 				return obj;
 			});

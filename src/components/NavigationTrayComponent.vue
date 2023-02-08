@@ -12,15 +12,22 @@ export default {
 	methods: {
 		goBack() {
 			this.currentTime.month--;
+			if (this.currentTime.month < 0) {
+				this.currentTime.month = 11;
+				this.currentTime.year--;
+			}
 		},
 		goForth() {
 			this.currentTime.month++;
+			if (this.currentTime.month > 11) {
+				this.currentTime.month = 0;
+				this.currentTime.year++;
+			}
 		}
 	},
 	computed: {
 		getFormattedTime() {
-			let date = new Date(this.currentTime.year, this.currentTime.month, 1, 12);
-			return `${date.getMonth()}.${date.getFullYear()}.`
+			return `${this.currentTime.month + 1}.${this.currentTime.year}.`
 		}
 	}
 }
