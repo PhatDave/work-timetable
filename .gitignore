@@ -27,3 +27,4 @@ package-lock.json
 yarn.lock
 server.exe
 db.db*
+dbBckp.db
